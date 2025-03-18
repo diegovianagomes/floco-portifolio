@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 10%;
+  --teal: 187 42% 42%;
+  --coral: 14 56% 62%;
+  --mint: 151 30% 70%;
+  --light-gray: 0 0% 95%;
+
+  /* Variáveis necessárias para o shadcn/ui */
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 3.9%;
+  --primary: 0 0% 9%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 0 0% 96.1%;
+  --secondary-foreground: 0 0% 9%;
+  --muted: 0 0% 96.1%;
+  --muted-foreground: 0 0% 45.1%;
+  --accent: 0 0% 96.1%;
+  --accent-foreground: 0 0% 9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 89.8%;
+  --input: 0 0% 89.8%;
+  --ring: 0 0% 3.9%;
+  --radius: 0.5rem;
+
+  /* Variáveis para a sidebar */
+  --sidebar-background: 0 0% 100%;
+  --sidebar-foreground: 0 0% 10%;
+  --sidebar-primary: 0 0% 9%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 0 0% 96.1%;
+  --sidebar-accent-foreground: 0 0% 9%;
+  --sidebar-border: 0 0% 89.8%;
+  --sidebar-ring: 0 0% 3.9%;
+
+  /* Variáveis para gráficos */
+  --chart-1: 0 84.2% 60.2%;
+  --chart-2: 215 100% 50%;
+  --chart-3: 120 100% 30%;
+  --chart-4: 43 100% 50%;
+  --chart-5: 270 100% 50%;
+}
+
+html,
+body {
+  background-color: white !important;
+  color: rgb(var(--foreground));
+}
+
+body {
+  color: rgb(var(--foreground));
+  background-color: rgb(var(--background));
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold;
+  }
+
+  html,
+  body {
+    @apply bg-white;
+  }
+}
+
+@layer components {
+  .nav-category {
+    @apply font-bold text-sm mb-2;
+  }
+
+  .nav-link {
+    @apply text-sm hover:underline block py-0.5;
+  }
+}
+
