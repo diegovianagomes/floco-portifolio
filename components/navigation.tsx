@@ -15,7 +15,7 @@ export default function Navigation() {
     institucional: false,
     interiores: false
   });
-  
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -24,13 +24,13 @@ export default function Navigation() {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     // Initial check
     checkIfMobile();
-    
+
     // Add event listener
     window.addEventListener('resize', checkIfMobile);
-    
+
     // Cleanup
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
@@ -50,7 +50,7 @@ export default function Navigation() {
     <>
       {/* Mobile menu button - only visible on small screens */}
       <div className="md:hidden fixed top-4 right-4 z-50">
-        <button 
+        <button
           onClick={toggleMobileMenu}
           className="p-2 bg-transparent"
           aria-label="Toggle menu"
@@ -88,12 +88,13 @@ export default function Navigation() {
         </div>
 
         <div className={`space-y-6 flex-1 ${isMobile ? 'pt-16 px-4 bg-white fixed inset-0 z-40' : ''}`}>
+          {/* Seção Residencial */}
           <div>
             <h2
               className="nav-category cursor-pointer flex items-center"
               onClick={() => toggleCategory('residencial')}
             >
-              residencial
+              Residencial
               <span className="ml-1">{openCategories.residencial ? '−' : '+'}</span>
             </h2>
             {openCategories.residencial && (
@@ -116,13 +117,13 @@ export default function Navigation() {
               </ul>
             )}
           </div>
-
+          {/* Seção Institucional */} 
           <div>
             <h2
               className="nav-category cursor-pointer flex items-center"
               onClick={() => toggleCategory('institucional')}
             >
-              institucional
+              Institucional
               <span className="ml-1">{openCategories.institucional ? '−' : '+'}</span>
             </h2>
             {openCategories.institucional && (
@@ -137,16 +138,21 @@ export default function Navigation() {
                     Jardim Botânico de Salvador
                   </Link>
                 </li>
+                <li>
+                  <Link href="/institucional/horto" className="nav-link">
+                    Centro de Interpretação da Mata Atlântica
+                  </Link>
+                </li>
               </ul>
             )}
           </div>
-
+          {/* Seção Interiores */}
           <div>
             <h2
               className="nav-category cursor-pointer flex items-center"
               onClick={() => toggleCategory('interiores')}
             >
-              interiores
+              Interiores
               <span className="ml-1">{openCategories.interiores ? '−' : '+'}</span>
             </h2>
             {openCategories.interiores && (
@@ -174,11 +180,19 @@ export default function Navigation() {
               </ul>
             )}
           </div>
-
+          {/* Quem-sou */}
           <div>
             <h2 className="nav-category">
               <Link href="/quem-sou" className="hover:underline">
-                quem sou
+                Quem Somos
+              </Link>
+            </h2>
+          </div>
+          {/* Contato */}
+          <div>
+            <h2 className="nav-category">
+              <Link href="/contato" className="hover:underline">
+                Contato
               </Link>
             </h2>
           </div>
