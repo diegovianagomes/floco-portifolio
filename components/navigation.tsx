@@ -1,289 +1,213 @@
 "use client"
+import { useState, useEffect, useCallback, memo } from "react"
 import Link from "next/link"
-import Logo from "@/components/logo"
-import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
+import dynamic from "next/dynamic"
+import type { CategoryName, NavigationItem } from "@/types/navigation"
 
-type CategoryName = 'residencial' | 'institucional' | 'interiores' | 'incorporacao';
+const Logo = dynamic(() => import("@/components/Logo"), {
+  ssr: false,
+  loading: () => <div className="w-16 h-16 bg-gray-200 animate-pulse" />
+})
 
-type CategoryState = {
-  [key in CategoryName]: boolean;
-};
+const navigationItems: NavigationItem[] = [
+  {
+    category: "residencial",
+    title: "Residencial",
+    items: [
+      { slug: "guyana-lodges-01", label: "Guyana Lodges 01" },
+      { slug: "guyana-lodges-02", label: "Guyana Lodges 02" },
+      { slug: "casa-alem-mar", label: "Casa Além Mar" },
+      { slug: "modhaus", label: "Modhaus" },
+      { slug: "mimo", label: "Chalé Mimo" },
+      { slug: "ottawa", label: "Casa Ottawa" },
+      { slug: "tiny-house", label: "Tiny House" },
+      { slug: "ivan-brand", label: "Casa-Ateliê Ivan Brandão" },
+      { slug: "lmd", label: "Casa LMD" },
+      { slug: "bromelia", label: "Casa Bromélia" }
+    ]
+  },
+  {
+    category: "institucional",
+    title: "Institucional",
+    items: [
+      { slug: "colabore", label: "Colabore" },
+      { slug: "jardim-botanico-salvador", label: "Jardim Botânico de Salvador" },
+      { slug: "horto", label: "Centro de Interpretação da Mata Atlântica" }
+    ]
+  },
+  {
+    category: "interiores",
+    title: "Interiores",
+    items: [
+      { slug: "apto-joaquim-antunes", label: "apto. floresta" },
+      { slug: "apto-iz-floresta", label: "apto. IZ Floresta" },
+      { slug: "apto-bela-vista", label: "apto. Bela Vista" },
+      { slug: "apto-vitoria-01", label: "apto. vitoria 01" },
+      { slug: "apto-vitoria-02", label: "apto. vitoria 02" }
+    ]
+  },
+  {
+    category: "incorporacao",
+    title: "Incorporação",
+    items: [
+      { slug: "apto-joaquim-antunes", label: "apto. floresta" },
+      { slug: "apto-iz-floresta", label: "apto. IZ Floresta" },
+      { slug: "apto-bela-vista", label: "apto. Bela Vista" },
+      { slug: "apto-vitoria-01", label: "apto. vitoria 01" },
+      { slug: "apto-vitoria-02", label: "apto. vitoria 02" }
+    ]
+  }
+]
+
+const MenuIcon = memo(() => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path d="M3 12H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M3 6H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M3 18H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+))
+
+const CloseIcon = memo(() => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path d="M18 6L6 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M6 6L18 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+))
+
+const MobileMenuButton = ({ isOpen, onClick }: { 
+  isOpen: boolean
+  onClick: () => void 
+}) => (
+  <button
+    onClick={onClick}
+    className="md:hidden fixed top-4 right-4 z-50 bg-[#B7CCE9] p-2 rounded"
+    aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
+    aria-controls="mobile-menu"
+    aria-expanded={isOpen}
+  >
+    {isOpen ? <CloseIcon /> : <MenuIcon />}
+  </button>
+)
 
 export default function Navigation() {
-  const pathname = usePathname(); // Hook para obter a rota atual
-  const isHomePage = pathname === '/'; // Verifica se estamos na página inicial
-  
-  const [openCategories, setOpenCategories] = useState<CategoryState>({
-    residencial: false,
-    institucional: false,
-    interiores: false,
-    incorporacao: false
-  });
+  const pathname = usePathname()
+  const isHomePage = pathname === "/"
+  const [isMobile, setIsMobile] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [openCategory, setOpenCategory] = useState<CategoryName | null>(null)
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Check if we're on mobile
   useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+    const mediaQuery = window.matchMedia("(max-width: 767px)")
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches)
+      if (!e.matches) setIsMobileMenuOpen(false)
+    }
 
-    // Initial check
-    checkIfMobile();
+    mediaQuery.addEventListener("change", handleMediaChange)
+    setIsMobile(mediaQuery.matches)
 
-    // Add event listener
-    window.addEventListener('resize', checkIfMobile);
+    return () => mediaQuery.removeEventListener("change", handleMediaChange)
+  }, [])
 
-    // Cleanup
-    return () => window.removeEventListener('resize', checkIfMobile);
-  }, []);
+  const toggleCategory = useCallback((category: CategoryName) => {
+    setOpenCategory(prev => prev === category ? null : category)
+  }, [])
 
-  const toggleCategory = (category: CategoryName) => {
-    setOpenCategories({
-      ...openCategories,
-      [category]: !openCategories[category]
-    });
-  };
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(prev => !prev)
+  }, [])
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(false)
+    setOpenCategory(null)
+  }, [])
 
   return (
-    <>
-      {/* Mobile menu button - only visible on small screens */}
-      <div className="md:hidden fixed top-4 right-4 z-50 bg-[#B7CCE9]">
-        <button
-          onClick={toggleMobileMenu}
-          className="p-2 bg-transparent"
-          aria-label="Toggle menu"
+      <>
+        <MobileMenuButton isOpen={isMobileMenuOpen} onClick={toggleMobileMenu} />
+
+        {isHomePage && !isMobileMenuOpen && (
+          <div className="md:hidden fixed top-4 left-4 z-50">
+            <Link href="/" onClick={closeMobileMenu}>
+              <Logo />
+            </Link>
+          </div>
+        )}
+
+        <nav
+          className={`fixed md:relative h-full bg-white md:bg-transparent z-40
+            transform transition-transform duration-300 ease-out
+            ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+            md:translate-x-0 w-64 md:w-auto`}
+          aria-label="Navegação principal"
         >
-          {isMobileMenuOpen ? (
-            // X icon for close
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M18 6L6 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M6 6L18 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          ) : (
-            // Hamburger icon
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 12H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 6H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 18H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          )}
-        </button>
-      </div>
+        <div className="md:hidden pt-20" /> {/* Spacer for mobile logo */}
 
-      {/* Logo only visible on homepage for mobile */}
-      {isHomePage && (
-        <div className="md:hidden fixed top-4 left-4 z-50 ">
-          <Link href="/">
-            <Logo />
-          </Link>
-        </div>
-      )}
-
-      {/* Navigation - hidden on mobile unless menu is open */}
-      <nav className={`flex flex-col h-full  ${isMobile && !isMobileMenuOpen ? 'hidden' : 'flex'} md:flex`}>
-        <div className="mb-8 hidden md:block">
-          <Link href="/">
+        <div className="hidden md:block mb-8">
+          <Link href="/" onClick={closeMobileMenu}>
             <Logo />
           </Link>
         </div>
 
-        <div className={`space-y-6 flex-1 ${isMobile ? 'pt-16 px-4 bg-white fixed inset-0 z-40' : ''}`}>
-          {/* Seção Residencial */}
-          <div className="mt-48">
-            <h2
-              className="nav-category cursor-pointer flex items-center"
-              onClick={() => toggleCategory('residencial')}
-            >
-              Residencial
-              <span className="ml-1">{openCategories.residencial ? '−' : '+'}</span>
-            </h2>
-            {openCategories.residencial && (
-              <ul>
-                <li>
-                  <Link href="/residencial/guyana-lodges-01" className="nav-link">
-                    Guyana Lodges 01
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/residencial/guyana-lodges-02" className="nav-link">
-                    Guyana Lodges 02
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/residencial/casa-alem-mar" className="nav-link">
-                    Casa Além Mar
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/residencial/modhaus" className="nav-link">
-                    Modhaus
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/residencial/mimo" className="nav-link">
-                    Chalé Mimo
-                  </Link>
-                </li>
+        <div className="space-y-6 px-4 md:px-0 overflow-y-auto h-[calc(100vh-6rem)] md:h-auto">
+          {navigationItems.map(({ category, title, items }) => (
+            <div key={category} className="group">
+              <h2
+                role="button"
+                tabIndex={0}
+                onClick={() => toggleCategory(category)}
+                onKeyDown={(e) => e.key === "Enter" && toggleCategory(category)}
+                className="flex items-center justify-between p-2 hover:bg-gray-50 rounded
+                  cursor-pointer transition-colors duration-200"
+                aria-expanded={openCategory === category}
+              >
+                <span className="font-medium text-gray-800">{title}</span>
+                <span className="text-gray-500">
+                  {openCategory === category ? "−" : "+"}
+                </span>
+              </h2>
+              
+              {openCategory === category && (
+                <ul className="ml-4 mt-2 space-y-2 border-l-2 border-gray-200 pl-4">
+                  {items.map(({ slug, label }) => (
+                    <li key={slug}>
+                      <Link
+                        href={`/${category}/${slug}`}
+                        onClick={closeMobileMenu}
+                        className={`block p-2 text-gray-600 rounded hover:bg-gray-50 
+                          transition-colors duration-200 ${
+                            pathname === `/${category}/${slug}`
+                              ? "font-semibold text-[#B7CCE9]"
+                              : ""
+                          }`}
+                      >
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
 
-                <li>
-                  <Link href="/residencial/ottawa" className="nav-link">
-                    Casa Ottawa
-                  </Link>
-                </li>
-
-                <li>
-                  <Link href="/residencial/tiny-house" className="nav-link">
-                    Tiny House
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/residencial/ivan-brand" className="nav-link">
-                    Casa-Ateliê Ivan Brandão
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/residencial/lmd" className="nav-link">
-                    Casa LMD
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/residencial/bromelia" className="nav-link">
-                    Casa Bromélia
-                  </Link>
-                </li>
-              </ul>
-            )}
-          </div>
-          {/* Seção Institucional */} 
-          <div>
-            <h2
-              className="nav-category cursor-pointer flex items-center"
-              onClick={() => toggleCategory('institucional')}
+          <div className="border-t border-gray-200 pt-4">
+            <Link
+              href="/quem-sou"
+              onClick={closeMobileMenu}
+              className="block p-2 text-gray-800 hover:bg-gray-50 rounded
+                transition-colors duration-200"
             >
-              Institucional
-              <span className="ml-1">{openCategories.institucional ? '−' : '+'}</span>
-            </h2>
-            {openCategories.institucional && (
-              <ul>
-                <li>
-                  <Link href="/institucional/colabore" className="nav-link">
-                    Colabore
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/institucional/jardim-botanico-salvador" className="nav-link">
-                    Jardim Botânico de Salvador
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/institucional/horto" className="nav-link">
-                    Centro de Interpretação da Mata Atlântica
-                  </Link>
-                </li>
-              </ul>
-            )}
-          </div>
-          {/* Seção Interiores */}
-          <div>
-            <h2
-              className="nav-category cursor-pointer flex items-center"
-              onClick={() => toggleCategory('interiores')}
+              Quem Somos
+            </Link>
+            <Link
+              href="/contato"
+              onClick={closeMobileMenu}
+              className="block p-2 text-gray-800 hover:bg-gray-50 rounded
+                transition-colors duration-200"
             >
-              Interiores
-              <span className="ml-1">{openCategories.interiores ? '−' : '+'}</span>
-            </h2>
-            {openCategories.interiores && (
-              <ul>
-                <li>
-                  <Link href="/interiores/apto-joaquim-antunes" className="nav-link">
-                    apto. floresta
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/interiores/apto-iz-floresta" className="nav-link">
-                    apto. IZ Floresta
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/interiores/apto-bela-vista" className="nav-link">
-                    apto. Bela Vista
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/interiores/apto-vitoria-01" className="nav-link">
-                    apto. vitoria 01
-                  </Link>
-                </li>
-
-                <li>
-                  <Link href="/interiores/apto-vitoria-02" className="nav-link">
-                    apto. vitoria 02
-                  </Link>
-                </li>
-              </ul>
-            )}
-          </div>
-          <div>
-            <h2
-              className="nav-category cursor-pointer flex items-center"
-              onClick={() => toggleCategory('incorporacao')}
-            >
-              Incorporação
-              <span className="ml-1">{openCategories.incorporacao ? '−' : '+'}</span>
-            </h2>
-            {openCategories.incorporacao && (
-              <ul>
-                <li>
-                  <Link href="/incorporacao/apto-joaquim-antunes" className="nav-link">
-                    apto. floresta
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/incorporacao/apto-iz-floresta" className="nav-link">
-                    apto. IZ Floresta
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/incorporacao/apto-bela-vista" className="nav-link">
-                    apto. Bela Vista
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/incorporacao/apto-vitoria-01" className="nav-link">
-                    apto. vitoria 01
-                  </Link>
-                </li>
-
-                <li>
-                  <Link href="/incorporacao/apto-vitoria-02" className="nav-link">
-                    apto. vitoria 02
-                  </Link>
-                </li>
-              </ul>
-            )}
-          </div>
-          {/* Quem-sou */}
-          <div>
-            <h2 className="nav-category">
-              <Link href="/quem-sou" className="hover:underline">
-                Quem Somos
-              </Link>
-            </h2>
-          </div>
-          {/* Contato */}
-          <div>
-            <h2 className="nav-category">
-              <Link href="/contato" className="hover:underline">
-                Contato
-              </Link>
-            </h2>
+              Contato
+            </Link>
           </div>
         </div>
       </nav>
