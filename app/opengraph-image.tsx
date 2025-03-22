@@ -36,7 +36,7 @@ export default async function Image() {
         <div style={{ fontSize: 120, fontWeight: "bold", lineHeight: "0.9" }}>C=</div>
         <div style={{ fontSize: 120, fontWeight: "bold", lineHeight: "0.9" }}>CI</div>
       </div>
-      <div style={{ fontSize: 32 }}>Floco Arquotetura</div>
+      <div style={{ fontSize: 32 }}>Floco Arquitetura</div>
     </div>,
     {
       ...size,

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og"
 
 // Image metadata
-export const alt = "Ceci Reichstul - Quem Sou"
+export const alt = "Floc.o Arquitetura - Quem Sou"
 export const size = {
   width: 1200,
   height: 630,
@@ -36,7 +36,7 @@ export default async function Image() {
         <div style={{ fontSize: 120, fontWeight: "bold", lineHeight: "0.9" }}>C=</div>
         <div style={{ fontSize: 120, fontWeight: "bold", lineHeight: "0.9" }}>CI</div>
       </div>
-      <div style={{ fontSize: 32 }}>Quem Sou - Ceci Reichstul</div>
+      <div style={{ fontSize: 32 }}>Quem Sou - Floc.o Arquitetura</div>
     </div>,
     {
       ...size,
